@@ -15,7 +15,6 @@ const COLORS: PuyoColor[] = ['red', 'green', 'blue', 'yellow', 'purple']
 
 // Helper functions
 const createEmptyGrid = (): Grid => Array(GRID_ROWS).fill(null).map(() => Array(GRID_COLS).fill(null))
-const randomPuyoColor = (): PuyoColor => COLORS[Math.floor(Math.random() * COLORS.length)]
 
 interface PuyoPair {
   color1: PuyoColor
@@ -259,7 +258,7 @@ export default function PuyoGame() {
 
   const animateChain = async (
     grid: (PuyoColor | null)[][],
-    chainCounter: number = 0
+    chainCount: number = 0  // chainCounterをchainCountに変更
   ) => {
     setIsChaining(true)
     const matchedPuyos = findMatches(grid);
@@ -267,24 +266,24 @@ export default function PuyoGame() {
     if (matchedPuyos.length > 0) {
       // マッチしたぷよを表示
       setGrid(grid);
-      await new Promise(resolve => setTimeout(resolve, 250)); // 0.25秒待機に変更
+      await new Promise(resolve => setTimeout(resolve, 250));
 
       // マッチしたぷよを消去
       const newGrid = removeMatchedPuyos(grid, matchedPuyos);
       setGrid(newGrid);
-      setScore(prevScore => prevScore + matchedPuyos.length * 10 * (chainCounter + 1));
-      setChainCounter(chainCounter + 1);
-      setDisplayChainCounter(chainCounter + 1);
+      setScore(prevScore => prevScore + matchedPuyos.length * 10 * (chainCount + 1));
+      setChainCounter(chainCount + 1);
+      setDisplayChainCounter(chainCount + 1);
       playSound(200, 0.1);
-      await new Promise(resolve => setTimeout(resolve, 250)); // 0.25秒待機に変更
+      await new Promise(resolve => setTimeout(resolve, 250));
 
       // 重力を適用
       const gridAfterGravity = applyGravity(newGrid);
       setGrid(gridAfterGravity);
-      await new Promise(resolve => setTimeout(resolve, 250)); // 0.25秒待機に変更
+      await new Promise(resolve => setTimeout(resolve, 250));
 
       // 次の連鎖をチェック
-      await animateChain(gridAfterGravity, chainCounter + 1);
+      await animateChain(gridAfterGravity, chainCount + 1);
 
       // チェーン表示のタイムアウトをクリア
       if (chainDisplayTimeoutRef.current) {
@@ -413,20 +412,6 @@ export default function PuyoGame() {
       default:
         return 'bg-gray-200'
     }
-  }
-
-  const renderGrid = () => {
-    return grid.map((row, y) => (
-      <div key={y} className="flex">
-        {row.map((color, x) => (
-          <div
-            key={`${x}-${y}`}
-            className={`puyo-cell ${getPuyoColorClass(color)} z-10`}
-            style={{position: 'relative'}}
-          />
-        ))}
-      </div>
-    ))
   }
 
   // コンポーネントのクリーンアップ
