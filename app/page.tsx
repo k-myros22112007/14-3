@@ -11,7 +11,6 @@ type Grid = PuyoColor[][]
 // Constants
 const GRID_ROWS = 12
 const GRID_COLS = 6
-const COLORS: PuyoColor[] = ['red', 'green', 'blue', 'yellow', 'purple']
 
 // Helper functions
 const createEmptyGrid = (): Grid => Array(GRID_ROWS).fill(null).map(() => Array(GRID_COLS).fill(null))
@@ -108,7 +107,6 @@ export default function PuyoGame() {
   const [score, setScore] = useState(0)
   const [currentPuyo, setCurrentPuyo] = useState<PuyoPair | null>(null)
   const [nextPuyos, setNextPuyos] = useState<PuyoPair[]>([])
-  const [chainCounter, setChainCounter] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
   const [highScore, setHighScore] = useState(0)
   const audioContext = useRef<AudioContext | null>(null)
@@ -172,11 +170,6 @@ export default function PuyoGame() {
   const startGame = () => {
     setGrid(createEmptyGrid())
     setScore(0)
-    setChainCounter(0)
-    const initialNextPuyos = generateNextPuyos()
-    setCurrentPuyo(initialNextPuyos[0])
-    setNextPuyos(initialNextPuyos.slice(1))
-    setGameState('active')
     setIsPaused(false)
     setFallSpeed(1000)
     fallSpeedRef.current = 1000
@@ -258,7 +251,7 @@ export default function PuyoGame() {
 
   const animateChain = async (
     grid: (PuyoColor | null)[][],
-    chainCount: number = 0  // chainCounterをchainCountに変更
+    chainCount: number = 0
   ) => {
     setIsChaining(true)
     const matchedPuyos = findMatches(grid);
@@ -272,7 +265,6 @@ export default function PuyoGame() {
       const newGrid = removeMatchedPuyos(grid, matchedPuyos);
       setGrid(newGrid);
       setScore(prevScore => prevScore + matchedPuyos.length * 10 * (chainCount + 1));
-      setChainCounter(chainCount + 1);
       setDisplayChainCounter(chainCount + 1);
       playSound(200, 0.1);
       await new Promise(resolve => setTimeout(resolve, 250));
@@ -290,7 +282,6 @@ export default function PuyoGame() {
         clearTimeout(chainDisplayTimeoutRef.current);
       }
     } else {
-      setChainCounter(0);
       setIsChaining(false)
 
       // チェーン表示を2秒間維持
