@@ -259,7 +259,7 @@ export default function PuyoGame() {
     const matchedPuyos = findMatches(grid);
 
     if (matchedPuyos.length > 0) {
-      // マッチしたぷよを表示
+      // マ��したぷよを表示
       setGrid(grid);
       await new Promise(resolve => setTimeout(resolve, 250));
 
